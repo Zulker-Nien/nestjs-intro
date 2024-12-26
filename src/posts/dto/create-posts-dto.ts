@@ -10,10 +10,11 @@ import {
   IsUrl,
   IsISO8601,
   ValidateNested,
+  MaxLength,
 } from 'class-validator';
 import { PostType } from '../enums/post-type.enum';
 import { PostStatus } from '../enums/post-status.enum';
-import { CreatePostMetaOptionsDTO } from './create-post-meta-options.dto';
+import { CreatePostMetaOptionsDTO } from '../../meta-options/dtos/create-post-meta-options.dto';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -21,6 +22,7 @@ export class CreatePostsDto {
   @ApiProperty()
   @IsString()
   @MinLength(4)
+  @MaxLength(512)
   @IsNotEmpty()
   title: string;
 
@@ -41,6 +43,7 @@ export class CreatePostsDto {
     message:
       'A slug should be all small letters and uses only "-" and without spaces. For example "my-url"',
   })
+  @MaxLength(256)
   slug: string;
 
   @ApiProperty({
@@ -74,6 +77,7 @@ export class CreatePostsDto {
   })
   @IsOptional()
   @IsUrl()
+  @MaxLength(1024)
   featuredImageUrl?: string;
 
   @ApiProperty({
@@ -95,27 +99,21 @@ export class CreatePostsDto {
   tags?: string[];
 
   @ApiPropertyOptional({
-    type: 'array',
+    type: () => CreatePostMetaOptionsDTO,
     required: false,
     items: {
       type: 'object',
       properties: {
-        key: {
-          type: 'string',
-          description: 'The key can be any identifier for your meta option',
-          example: 'sidebarEnabled',
-        },
-        value: {
-          type: 'any',
-          description: 'Any value you want to save to the key',
-          example: true,
+        metavalue: {
+          type: 'json',
+          description: 'The metaValue is a JSON string',
+          example: '{"sidebarEnabled": true}',
         },
       },
     },
   })
   @IsOptional()
-  @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreatePostMetaOptionsDTO)
-  metaOptions?: CreatePostMetaOptionsDTO[];
+  metaOptions?: CreatePostMetaOptionsDTO | null;
 }

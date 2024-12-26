@@ -47,16 +47,10 @@ export class UsersController {
   ) {
     return this.usersService.findAll(getUsersParamDto, limit, page);
   }
-  // @Post()
-  // public createUsers(@Body() request: any) {
-  //   console.log(request);
-  //   return 'You sent a get request';
-  // }
+
   @Post()
   public createUsers(@Body() createUserDto: CreateUserDto) {
-    console.log(createUserDto);
-
-    return 'You sent a get request';
+    return this.usersService.createUser(createUserDto);
   }
   @Patch()
   public patchUser(@Body() patchUserDto: PatchUserDto) {
