@@ -2,6 +2,13 @@ PATCH http://localhost:3000/posts
 Content-Type: application/json
 
 {
-    "id":12, 
-    "postType":"post"
+    "id":10,
+    "title": "What's new with m2m",
+    "postType": "post",
+    "status": "draft",
+    "content": "test content",
+    "metaOptions": {
+      "metaValue": "{\"sidebarEnabled\":true, \"footerActive\":true}"
+    },
+    "tags":[1,2]
 }

@@ -4,7 +4,7 @@ Content-Type: application/json
 {
     "title": "What's new with Nest&JS",
     "postType": "post",
-    "slug": "new-with-nest-js-with-cascade",
+    "slug": "new-with-nest-js-4",
     "status": "scheduled",
     "content": "post-content",
     "schema": "{\r\n    \"@context\": \"https:\/\/schema.org\",\r\n    \"@type\": \"Person\"\r\n  }",
@@ -16,6 +16,7 @@ Content-Type: application/json
     //],
     "metaOptions": {
       "metaValue": "{\"sidebarEnabled\":true, \"footerActive\":true}"
-    }
-  
+    },
+    "authorId":1,
+    "tags":[1, 2]
 }

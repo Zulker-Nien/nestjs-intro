@@ -11,6 +11,7 @@ import {
   IsISO8601,
   ValidateNested,
   MaxLength,
+  IsInt,
 } from 'class-validator';
 import { PostType } from '../enums/post-type.enum';
 import { PostStatus } from '../enums/post-status.enum';
@@ -89,14 +90,13 @@ export class CreatePostsDto {
   publishOn?: Date;
 
   @ApiPropertyOptional({
-    description: 'Array of tags passed as string values',
-    example: ['nestjs', 'typescript'],
+    description: 'Array of ids of tags',
+    example: [1, 2],
   })
   @IsArray()
   @IsOptional()
-  @IsString({ each: true })
-  @MinLength(3, { each: true })
-  tags?: string[];
+  @IsInt({ each: true })
+  tags?: number[];
 
   @ApiPropertyOptional({
     type: () => CreatePostMetaOptionsDTO,
@@ -116,4 +116,13 @@ export class CreatePostsDto {
   @ValidateNested({ each: true })
   @Type(() => CreatePostMetaOptionsDTO)
   metaOptions?: CreatePostMetaOptionsDTO | null;
+
+  @ApiProperty({
+    type: 'integer',
+    required: true,
+    example: 1,
+  })
+  @IsNotEmpty()
+  @IsInt()
+  authorId: number;
 }

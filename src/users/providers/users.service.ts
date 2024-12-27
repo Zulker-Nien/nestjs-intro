@@ -1,9 +1,21 @@
-import { Injectable } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  RequestTimeoutException,
+} from '@nestjs/common';
 import { GetUsersParamDto } from '../dtos/get-users-param.dto';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User } from '../user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
+import { ConfigType } from '@nestjs/config';
+import profileConfig from '../config/profile.config';
+import { UsersCreateManyProvider } from './users-create-many.provider';
+import { CreateManyUsersDto } from '../dtos/create-many-users.dto';
 
 /** Class to connect users table and perform business operations */
 @Injectable()
@@ -12,17 +24,46 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @Inject(profileConfig.KEY)
+    private readonly profileConfiguration: ConfigType<typeof profileConfig>,
+
+    private readonly usersCreateManyProvider: UsersCreateManyProvider,
   ) {}
 
   public async createUser(createUserDto: CreateUserDto) {
     // Check if user exists with same email
-    const existingUser = await this.usersRepository.findOne({
-      where: { email: createUserDto.email },
-    });
+    let existingUser = undefined;
+    try {
+      existingUser = await this.usersRepository.findOne({
+        where: { email: createUserDto.email },
+      });
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'Unable to process your request at the moment. Please try later',
+        {
+          description: 'Error connecting to the database',
+        },
+      );
+    }
+
     // Handle Exceptions
+    if (existingUser) {
+      throw new BadRequestException(
+        'User already exists. Please check your email.',
+      );
+    }
     // Create a new user
     let newUser = this.usersRepository.create(createUserDto);
-    newUser = await this.usersRepository.save(newUser);
+    try {
+      newUser = await this.usersRepository.save(newUser);
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'Unable to process your request at the moment. Please try later',
+        {
+          description: 'Error connecting to the database',
+        },
+      );
+    }
 
     return newUser;
   }
@@ -33,28 +74,40 @@ export class UsersService {
     limit: number,
     page: number,
   ) {
-    console.log(getUsersParamDto, limit, page);
-    return [
+    throw new HttpException(
       {
-        firstName: 'John',
-        email: 'john@doe.com',
+        status: HttpStatus.MOVED_PERMANENTLY,
+        error: "The API endpoint doesn't exist",
+        fileName: 'users.service.ts',
+        lineNumber: 88,
       },
+      HttpStatus.MOVED_PERMANENTLY,
       {
-        firstName: 'Alice',
-        email: 'alice@doe.com',
+        cause: new Error(),
+        description: 'Occured because the API was moved permanently',
       },
-    ];
+    );
   }
 
   /** Fnding a single user using the Id of the user */
-  public findOneById(id: string) {
-    console.log(id);
-    return [
-      {
-        id: 1234,
-        firstName: 'Alice',
-        email: 'alice@doe.com',
-      },
-    ];
+  public async findOneById(id: number) {
+    let user = undefined;
+    try {
+      user = await this.usersRepository.findOneBy({ id });
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'Unable to process your request at the moment. Please try later',
+        {
+          description: 'Error connecting to the database',
+        },
+      );
+    }
+    if (!user) {
+      throw new BadRequestException('User ID does not exist');
+    }
+    return user;
+  }
+  public async createMany(createManyUsersDto: CreateManyUsersDto) {
+    await this.usersCreateManyProvider.createMany(createManyUsersDto);
   }
 }
