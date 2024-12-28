@@ -8,10 +8,10 @@ import {
   Matches,
   IsJSON,
   IsUrl,
-  IsISO8601,
   ValidateNested,
   MaxLength,
   IsInt,
+  IsDate,
 } from 'class-validator';
 import { PostType } from '../enums/post-type.enum';
 import { PostStatus } from '../enums/post-status.enum';
@@ -83,9 +83,9 @@ export class CreatePostsDto {
 
   @ApiProperty({
     description: 'Must be a valid timestamp in ISO8601',
-    example: '2024-03-16T07:46:32+0000',
+    example: '2024-03-16T07:46:32+0000Z',
   })
-  @IsISO8601()
+  @IsDate()
   @IsOptional()
   publishOn?: Date;
 

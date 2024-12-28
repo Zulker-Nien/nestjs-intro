@@ -1,1 +1,10 @@
-GET http://localhost:3000/posts/1234
+{{
+    const date = new Date();
+    exports.startDate = date.toString();
+    exports.endDate = date.toString();
+}}
+    
+
+GET http://localhost:3000/posts/
+    ?limit=1
+    &page=5
