@@ -15,7 +15,7 @@ async function bootstrap() {
     }),
   );
   // Swagger Documentation
-  const config = new DocumentBuilder()
+  const swaggerConfig = new DocumentBuilder()
     .setTitle('Nestjs Masterclass')
     .setDescription('Use the base api url http://localhost:3000')
     .setTermsOfService('Use the base api url http://localhost:3000')
@@ -23,8 +23,9 @@ async function bootstrap() {
     .setVersion('1.0')
     .addServer('http://localhost:3000')
     .build();
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api', app, document);
+  app.enableCors();
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
